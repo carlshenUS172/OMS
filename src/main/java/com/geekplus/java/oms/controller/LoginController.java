@@ -8,7 +8,9 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 
+import java.util.HashMap;
 import java.util.Map;
 
 @Controller
@@ -22,39 +24,51 @@ public class LoginController {
     }
 
     @GetMapping("/login")
-    public String getLoginPage() {
+    public String getLoginPage(HttpSession session) {
+        System.out.println(session.getAttribute("userId"));
         return "login/login";
     }
 
     @PostMapping("/register")
-    public String register(Model model, User user) {
+    @ResponseBody
+    public Map<String, Object> register(String username, String password) {  // /oms/register
+        User user = new User();
+        user.setUsername(username);
+        user.setPassword(password);
+
         Map<String, Object> map = userService.register(user);
+        Map<String, Object> model = new HashMap<>();
         if (map == null || map.isEmpty()) {
-            model.addAttribute("msg", "Register success!");
-            return "redirect:login/login";
+            model.put("msg", "Register success!");
         } else {
-            model.addAttribute("usernameMsg", map.get("usernameMsg"));
-            model.addAttribute("passwordMsg", map.get("passwordMsg"));
-            return "login/register";
+            model.put("usernameMsg", map.get("usernameMsg"));
+            model.put("passwordMsg", map.get("passwordMsg"));
         }
+        return model;
     }
 
     @PostMapping("/login")
-    public String login(String username, String password, HttpSession session, Model model) {
+    @ResponseBody
+    public Map<String, Object> login(String username, String password, HttpSession session) {  // /oms/login
         Map<String, Object> map = userService.login(username, password);
+        Map<String, Object> model = new HashMap<>();
         if (map.containsKey("userId")) {
             session.setAttribute("userId", map.get("userId"));
-            return "redirect:/index";
+            System.out.println(session.getAttribute("userId"));
+            model.put("msg", map.get("userId") + " Login success!");
         } else {
-            model.addAttribute("usernameMsg", map.get("usernameMsg"));
-            model.addAttribute("passwordMsg", map.get("passwordMsg"));
-            return "site/login";
+            model.put("usernameMsg", map.get("usernameMsg"));
+            model.put("passwordMsg", map.get("passwordMsg"));
         }
+        return model;
     }
 
-    @GetMapping("/logout")
-    public String logout(HttpSession session) {
+    @PostMapping("/logout")
+    @ResponseBody
+    public Map<String, Object> logout(HttpSession session) {
         session.invalidate();
-        return "redirect:/login";
+        Map<String, Object> model = new HashMap<>();
+        model.put("msg", "Logged out");
+        return model;
     }
 }

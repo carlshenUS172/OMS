@@ -1,5 +1,7 @@
 package com.geekplus.java.oms.controller;
 
+import com.geekplus.java.oms.entity.Order;
+import com.geekplus.java.oms.entity.Product;
 import com.geekplus.java.oms.service.OrderService;
 import com.geekplus.java.oms.service.ProductService;
 import jakarta.servlet.http.HttpSession;
@@ -7,32 +9,40 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Controller
-@RequestMapping("product")
+@RequestMapping("/product")
 public class ProductController {
     @Autowired
     private ProductService productService;
 
-    @GetMapping("list")
-    public String getProducts(Model model) {
-        model.addAttribute("productList", productService.getProductList());
-        return "product/list";
+    @GetMapping("/list")
+    @ResponseBody
+    public Map<String, Object> getProducts() {  // /oms/product/list
+        Map<String, Object> model = new HashMap<>();
+        List<Product> productList = productService.getProductList();
+        model.put("productList", productList);
+        return model;
     }
 
-    @PostMapping("purchase/{productId}")
-    public String purchaseProduct(Model model, HttpSession session, @PathVariable("productId") String productId) {
+    @PostMapping("/purchase/{productId}")
+    @ResponseBody
+    public Map<String, Object> purchaseProduct(HttpSession session, @PathVariable("productId") String productId) {  // /oms/product/purchase/{productId}
+        Map<String, Object> model = new HashMap<>();
         Object userInfo = session.getAttribute("userId");
         if (userInfo == null) {
-            return "login/login";
+            model.put("Msg", "Not log in!");
+            return model;
         }
 
         String userId = userInfo.toString();
-        productService.purchase(userId, productId);
-        return "order/list";
+        int res = productService.purchase(userId, productId);
+        model.put("Msg", res + " order created");
+        return model;
     }
 }

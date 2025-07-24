@@ -14,5 +14,5 @@ public interface OrderMapper {
 
     public Order getOrderById(@Param("id") String id);
 
-    public void addOrder(String userId, String orderId);
+    public int addOrder(Order order);
 }

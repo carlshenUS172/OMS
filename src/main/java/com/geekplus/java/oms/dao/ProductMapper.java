@@ -13,4 +13,7 @@ public interface ProductMapper {
     public List<Product> getProductList();
 
     public Order getProductById(@Param("id") String id);
+
+    public Product addProduct(@Param("productName") String productName, @Param("quantity") int quantity);
+
 }

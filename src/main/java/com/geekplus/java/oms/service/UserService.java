@@ -62,7 +62,6 @@ public class UserService {
             return map;
         }
 
-        hostHolder.setUser(user);
         map.put("userId", user.getId());
         return map;
     }

@@ -9,37 +9,46 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Controller
-@RequestMapping("order")
+@RequestMapping("/order")
 public class OrderController {
     @Autowired
     private OrderService orderService;
 
     @GetMapping(path = "/list")
-    public String getOrderList(Model model, HttpSession session) {
+    @ResponseBody
+    public Map<String, Object> getOrderList(HttpSession session) {  // /oms/order/list
+        Map<String, Object> model = new HashMap<>();
         Object userInfo = session.getAttribute("userId");
         if (userInfo == null) {
-            return "login/login";
+            model.put("Msg", "Not log in!");
+            return model;
         }
 
         String userId = userInfo.toString();
         List<Order> orderList = orderService.getOrderList(userId);
-        model.addAttribute("orderList", orderList);
-        return "order/list";
+        model.put("orderList", orderList);
+        return model;
     }
 
     @GetMapping(path = "/detail/{orderId}")
-    public String getOrderDetail(@PathVariable("orderId") String orderId, Model model, HttpSession session) {
+    @ResponseBody
+    public Map<String, Object> getOrderDetail(@PathVariable("orderId") String orderId, HttpSession session) {  // /oms/order/detail/{orderId}
+        Map<String, Object> model = new HashMap<>();
         Object userInfo = session.getAttribute("userId");
         if (userInfo == null) {
-            return "login/login";
+            model.put("Msg", "Not log in!");
+            return model;
         }
 
         Order order = orderService.getOrderById(orderId);
-        model.addAttribute("orderList", order);
-        return "order/detail";
+        model.put("orderList", order);
+        return model;
     }
 }
