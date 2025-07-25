@@ -29,12 +29,6 @@ public class PurchaseConcurrencyTest {
             "c203ce7f-695d-11f0-97e3-8c3b4ab2d146",
             "d4e5f6a7-b890-1234-d567-f890g123h456"};
 
-    @BeforeEach
-    public void initProduct() {
-        // 设置初始库存，例如 10 件
-        productMapper.setQuantity(PRODUCT_ID, 10);  // 你需要写一个 update SQL
-    }
-
     @Test
     public void testConcurrentPurchase() throws InterruptedException {
         ExecutorService executor = Executors.newFixedThreadPool(THREAD_COUNT);

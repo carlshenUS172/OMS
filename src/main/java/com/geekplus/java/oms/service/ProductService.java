@@ -5,6 +5,8 @@ import com.geekplus.java.oms.dao.ProductMapper;
 import com.geekplus.java.oms.entity.Order;
 import com.geekplus.java.oms.entity.Product;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisOperations;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,6 +24,11 @@ public class ProductService {
     @Autowired
     private UserService userService;
 
+    @Autowired
+    private StringRedisTemplate operations;
+
+    private final String REDIS_KEY_PREFIX = "productStock:";
+
     private final ReentrantLock lock = new ReentrantLock();
     @Autowired
     private OrderService orderService;
@@ -30,33 +37,49 @@ public class ProductService {
         return productMapper.getProductList();
     }
 
-    public int getProductQuantity(String productId) {
-        return productMapper.getQuantity(productId);
-    }
-
     @Transactional
-    public boolean purchase(String userId, String productId) {
+    public boolean purchase(String userId, String productId, int quantityToDeduct) {
         //  双重检查锁
-        int quantityToDeduct = 1;
-        Product product = productMapper.getProductById(productId);
-        if (product.getQuantity() < quantityToDeduct) {
+        String productKey = REDIS_KEY_PREFIX + productId;
+
+        Object value = operations.opsForValue().get(productKey);
+        int stock = value == null ? 0 : Integer.parseInt((String) value);
+        if (stock < quantityToDeduct) {
             return false;
         }
 
         lock.lock();
         try {
             // 加锁后再次判断库存
-            product = productMapper.getProductById(productId);
-            if (product.getQuantity() < quantityToDeduct) {
-                return false;  // 已被其他线程扣完
+            value = operations.opsForValue().get(productKey);
+            stock = value == null ? 0 : Integer.parseInt((String) value);
+            if (stock < quantityToDeduct) {
+                return false;
             }
 
             // 执行业务操作
-            if (productMapper.deductQuantity(productId, quantityToDeduct) == 0) return false;
+//            if (productMapper.deductQuantity(productId, quantityToDeduct) == 0) return false;
+            Long remain = operations.opsForValue().decrement(productKey, quantityToDeduct);
+            if (remain == null || remain < 0) {
+                operations.opsForValue().increment(productKey, quantityToDeduct);  // 回滚补偿
+                return false;
+            }
+
+            // 插入订单
             int res = orderService.addOrder(userId, productId);
+            if (res != 1) {
+                operations.opsForValue().increment(productKey, quantityToDeduct);  // 回滚补偿
+                return false;
+            }
+
             return true;
         } finally {
             lock.unlock();
         }
+    }
+
+    @Transactional
+    public boolean purchase(String userId, String productId) {
+        return purchase(userId, productId, 1);
     }
 }
