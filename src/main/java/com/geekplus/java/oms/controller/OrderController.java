@@ -4,6 +4,7 @@ import com.geekplus.java.oms.entity.Order;
 import com.geekplus.java.oms.service.OrderService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -22,33 +23,25 @@ public class OrderController {
     private OrderService orderService;
 
     @GetMapping(path = "/list")
-    @ResponseBody
-    public Map<String, Object> getOrderList(HttpSession session) {  // /oms/order/list
-        Map<String, Object> model = new HashMap<>();
+    public ResponseEntity<String> getOrderList(HttpSession session) {  // /oms/order/list
         Object userInfo = session.getAttribute("userId");
         if (userInfo == null) {
-            model.put("Msg", "Not log in!");
-            return model;
+            return ResponseEntity.badRequest().body("not logged in!");
         }
 
         String userId = userInfo.toString();
         List<Order> orderList = orderService.getOrderList(userId);
-        model.put("orderList", orderList);
-        return model;
+        return ResponseEntity.ok(orderList.stream().map(Order::toString).toString());
     }
 
     @GetMapping(path = "/detail/{orderId}")
-    @ResponseBody
-    public Map<String, Object> getOrderDetail(@PathVariable("orderId") String orderId, HttpSession session) {  // /oms/order/detail/{orderId}
-        Map<String, Object> model = new HashMap<>();
+    public ResponseEntity<String> getOrderDetail(@PathVariable("orderId") String orderId, HttpSession session) {  // /oms/order/detail/{orderId}
         Object userInfo = session.getAttribute("userId");
         if (userInfo == null) {
-            model.put("Msg", "Not log in!");
-            return model;
+            return ResponseEntity.badRequest().body("not logged in!");
         }
 
         Order order = orderService.getOrderById(orderId);
-        model.put("orderList", order);
-        return model;
+        return ResponseEntity.ok(order.toString());
     }
 }

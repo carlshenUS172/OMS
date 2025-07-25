@@ -4,6 +4,7 @@ import com.geekplus.java.oms.entity.User;
 import com.geekplus.java.oms.service.UserService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -19,56 +20,46 @@ public class LoginController {
     UserService userService;
 
     @GetMapping("/register")
-    public String getRegisterPage() {
-        return "login/register";
+    public ResponseEntity<String> getRegisterPage() {
+        return ResponseEntity.ok("Register page");
     }
 
     @GetMapping("/login")
-    public String getLoginPage(HttpSession session) {
+    public ResponseEntity<String> getLoginPage(HttpSession session) {
         System.out.println(session.getAttribute("userId"));
-        return "login/login";
+        return ResponseEntity.ok("Login page");
     }
 
     @PostMapping("/register")
-    @ResponseBody
-    public Map<String, Object> register(String username, String password) {  // /oms/register
+    public ResponseEntity<String> register(String username, String password) {  // /oms/register
         User user = new User();
         user.setUsername(username);
         user.setPassword(password);
 
         Map<String, Object> map = userService.register(user);
-        Map<String, Object> model = new HashMap<>();
         if (map == null || map.isEmpty()) {
-            model.put("msg", "Register success!");
+            return ResponseEntity.ok("Register success!");
         } else {
-            model.put("usernameMsg", map.get("usernameMsg"));
-            model.put("passwordMsg", map.get("passwordMsg"));
+            return ResponseEntity.badRequest().body(map.get("usernameMsg").toString() + " " + map.get("passwordMsg").toString());
         }
-        return model;
     }
 
     @PostMapping("/login")
-    @ResponseBody
-    public Map<String, Object> login(String username, String password, HttpSession session) {  // /oms/login
+    public ResponseEntity<String> login(String username, String password, HttpSession session) {  // /oms/login
         Map<String, Object> map = userService.login(username, password);
-        Map<String, Object> model = new HashMap<>();
         if (map.containsKey("userId")) {
             session.setAttribute("userId", map.get("userId"));
             System.out.println(session.getAttribute("userId"));
-            model.put("msg", map.get("userId") + " Login success!");
+            return ResponseEntity.ok("Register success!");
         } else {
-            model.put("usernameMsg", map.get("usernameMsg"));
-            model.put("passwordMsg", map.get("passwordMsg"));
+            return ResponseEntity.badRequest().body(map.get("usernameMsg").toString() + " " + map.get("passwordMsg").toString());
         }
-        return model;
     }
 
     @PostMapping("/logout")
-    @ResponseBody
-    public Map<String, Object> logout(HttpSession session) {
+    public ResponseEntity<String> logout(HttpSession session) {
         session.invalidate();
         Map<String, Object> model = new HashMap<>();
-        model.put("msg", "Logged out");
-        return model;
+        return ResponseEntity.ok("logged out");
     }
 }

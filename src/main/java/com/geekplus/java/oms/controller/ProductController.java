@@ -7,6 +7,7 @@ import com.geekplus.java.oms.service.ProductService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -22,27 +23,21 @@ public class ProductController {
     private ProductService productService;
 
     @GetMapping("/list")
-    @ResponseBody
-    public Map<String, Object> getProducts() {  // /oms/product/list
-        Map<String, Object> model = new HashMap<>();
+    public ResponseEntity<String> getProducts() {  // /oms/product/list
         List<Product> productList = productService.getProductList();
-        model.put("productList", productList);
-        return model;
+        return ResponseEntity.ok(productList.stream().map(Product::toString).toString());
     }
 
     @PostMapping("/purchase/{productId}")
-    @ResponseBody
-    public Map<String, Object> purchaseProduct(HttpSession session, @PathVariable("productId") String productId) {  // /oms/product/purchase/{productId}
-        Map<String, Object> model = new HashMap<>();
+    public ResponseEntity<String> purchaseProduct(HttpSession session, @PathVariable("productId") String productId) {  // /oms/product/purchase/{productId}
         Object userInfo = session.getAttribute("userId");
         if (userInfo == null) {
-            model.put("Msg", "Not log in!");
-            return model;
+            return ResponseEntity.badRequest().body("not logged in!");
         }
 
         String userId = userInfo.toString();
         boolean res = productService.purchase(userId, productId);
-        model.put("Msg", res ? "order created" : "order failed!");
-        return model;
+
+        return res ? ResponseEntity.ok("order created") : ResponseEntity.badRequest().body("order failed!");
     }
 }
