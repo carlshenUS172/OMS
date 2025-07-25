@@ -15,9 +15,27 @@
         where id = #{id}
     </select>
 
+    <select id="getQuantity">
+        select quantity
+        from product
+        where id = #{id}
+    </select>
+
     <insert id="addProduct" keyProperty="id">
         insert into product (name, quantity)
         values(#{productName}, #{quantity})
     </insert>
+
+    <update id="deductQuantity">
+        update product
+        set quantity = quantity - #{quantityToDeduct}
+        where id = #{productId} and quantity >= #{quantityToDeduct}
+    </update>
+
+    <update id="setQuantity">
+        update product
+        set quantity = #{quantity}
+        where id = #{productId}
+    </update>
 
 </mapper>

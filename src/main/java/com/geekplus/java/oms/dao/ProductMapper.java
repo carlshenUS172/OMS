@@ -12,8 +12,13 @@ import java.util.List;
 public interface ProductMapper {
     public List<Product> getProductList();
 
-    public Order getProductById(@Param("id") String id);
+    public Product getProductById(@Param("id") String id);
 
     public Product addProduct(@Param("productName") String productName, @Param("quantity") int quantity);
 
+    int deductQuantity(@Param("productId") String productId, @Param("quantityToDeduct") int quantityToDeduct);
+
+    int getQuantity(String productId);
+
+    void setQuantity(@Param("productId") String productId, @Param("quantity") int quantity);
 }

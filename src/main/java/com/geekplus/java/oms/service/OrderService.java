@@ -22,4 +22,11 @@ public class OrderService {
     public Order getOrderById(String id) {
         return orderMapper.getOrderById(id);
     }
+
+    public int addOrder(String userId, String productId) {
+        Order order = new Order();
+        order.setUserId(userId);
+        order.setProductId(productId);
+        return orderMapper.addOrder(order);
+    }
 }

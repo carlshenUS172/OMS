@@ -41,8 +41,8 @@ public class ProductController {
         }
 
         String userId = userInfo.toString();
-        int res = productService.purchase(userId, productId);
-        model.put("Msg", res + " order created");
+        boolean res = productService.purchase(userId, productId);
+        model.put("Msg", res ? "order created" : "order failed!");
         return model;
     }
 }

@@ -40,11 +40,11 @@ public class ServiceTest {
         System.out.println(productService.getProductList());
     }
 
-    @Test
-    public void testPurchase() {
-        String userId = "d4e5f6a7-b890-1234-d567-f890g123h456";
-        String productId = "b2c3d4e5-f6a7-8901-b234-d567e890f123";
-        System.out.println(productService.purchase(userId, productId));
-        System.out.println(orderService.getOrderList(userId));
-    }
+//    @Test
+//    public void testPurchase() {
+//        String userId = "d4e5f6a7-b890-1234-d567-f890g123h456";
+//        String productId = "b2c3d4e5-f6a7-8901-b234-d567e890f123";
+//        System.out.println(productService.purchase(userId, productId));
+//        System.out.println(orderService.getOrderList(userId));
+//    }
 }

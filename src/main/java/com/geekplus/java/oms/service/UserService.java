@@ -66,6 +66,10 @@ public class UserService {
         return map;
     }
 
+    public User getUserByUsername(String username) {
+        return userMapper.selectByName(username);
+    }
+
     private Boolean isEmptyString(String s) {
         return s == null || s.isEmpty();
     }
