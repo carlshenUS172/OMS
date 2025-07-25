@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.geekplus.java.oms.dao.OrderMapper">
+
+    <select id="getOrderList" resultType="Order">
+        select id, user_id, product_id, status
+        from orders
+        where user_id = #{userId}
+    </select>
+
+    <select id="getOrderById" resultType="Order">
+        select id, user_id, product_id, status
+        from orders
+        where id = #{id}
+    </select>
+
+    <insert id="addOrder" parameterType="Order" keyProperty="orderId">
+        insert into orders (user_id, product_id, status)
+        values(#{userId}, #{productId}, 0)
+    </insert>
+
+</mapper>
