@@ -14,7 +14,7 @@ public class UserService {
     private UserMapper userMapper;
 
     public Map<String, Object> register(User user) {
-        Map<String, Object> map = new HashMap<>();
+        Map<String, Object> map = new HashMap<>();  // 返回的信息
 
         if (user == null) {
             throw new IllegalArgumentException("No parameter!");
@@ -34,6 +34,7 @@ public class UserService {
             return map;
         }
 
+        // 插入用户，id由数据库自动生成
         userMapper.insertUser(user);
 
         return map;
@@ -51,6 +52,7 @@ public class UserService {
             return map;
         }
 
+        // 数据库中拿user
         User user = userMapper.selectByName(username);
         if (user == null) {
             map.put("usernameMsg", "No such username!");

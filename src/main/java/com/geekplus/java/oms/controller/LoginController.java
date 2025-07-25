@@ -31,7 +31,8 @@ public class LoginController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<String> register(String username, String password) {  // /oms/register
+    // url: /oms/register
+    public ResponseEntity<String> register(String username, String password) {
         User user = new User();
         user.setUsername(username);
         user.setPassword(password);
@@ -45,9 +46,12 @@ public class LoginController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<String> login(String username, String password, HttpSession session) {  // /oms/login
+    // url: /oms/login
+    public ResponseEntity<String> login(String username, String password, HttpSession session) {
         Map<String, Object> map = userService.login(username, password);
+        // 有userid说明找到用户
         if (map.containsKey("userId")) {
+            // userId放入session
             session.setAttribute("userId", map.get("userId"));
             System.out.println(session.getAttribute("userId"));
             return ResponseEntity.ok("login success!");
@@ -58,8 +62,8 @@ public class LoginController {
 
     @PostMapping("/logout")
     public ResponseEntity<String> logout(HttpSession session) {
+        // session失效
         session.invalidate();
-        Map<String, Object> model = new HashMap<>();
         return ResponseEntity.ok("logged out");
     }
 }

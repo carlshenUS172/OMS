@@ -23,7 +23,9 @@ public class OrderController {
     private OrderService orderService;
 
     @GetMapping(path = "/list")
-    public ResponseEntity<String> getOrderList(HttpSession session) {  // /oms/order/list
+    // url: /oms/order/list
+    public ResponseEntity<String> getOrderList(HttpSession session) {
+        // session-based 判断是否登录
         Object userInfo = session.getAttribute("userId");
         if (userInfo == null) {
             return ResponseEntity.badRequest().body("not logged in!");
@@ -35,7 +37,8 @@ public class OrderController {
     }
 
     @GetMapping(path = "/detail/{orderId}")
-    public ResponseEntity<String> getOrderDetail(@PathVariable("orderId") String orderId, HttpSession session) {  // /oms/order/detail/{orderId}
+    // url: /oms/order/detail/{orderId}
+    public ResponseEntity<String> getOrderDetail(@PathVariable("orderId") String orderId, HttpSession session) {
         Object userInfo = session.getAttribute("userId");
         if (userInfo == null) {
             return ResponseEntity.badRequest().body("not logged in!");
