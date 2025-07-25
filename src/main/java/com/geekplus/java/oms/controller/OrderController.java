@@ -31,7 +31,7 @@ public class OrderController {
 
         String userId = userInfo.toString();
         List<Order> orderList = orderService.getOrderList(userId);
-        return ResponseEntity.ok(orderList.stream().map(Order::toString).toString());
+        return ResponseEntity.ok(orderList.toString());
     }
 
     @GetMapping(path = "/detail/{orderId}")

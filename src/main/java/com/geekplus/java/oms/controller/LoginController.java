@@ -50,7 +50,7 @@ public class LoginController {
         if (map.containsKey("userId")) {
             session.setAttribute("userId", map.get("userId"));
             System.out.println(session.getAttribute("userId"));
-            return ResponseEntity.ok("Register success!");
+            return ResponseEntity.ok("login success!");
         } else {
             return ResponseEntity.badRequest().body(map.get("usernameMsg").toString() + " " + map.get("passwordMsg").toString());
         }

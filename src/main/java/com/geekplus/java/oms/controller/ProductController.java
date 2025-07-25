@@ -25,7 +25,7 @@ public class ProductController {
     @GetMapping("/list")
     public ResponseEntity<String> getProducts() {  // /oms/product/list
         List<Product> productList = productService.getProductList();
-        return ResponseEntity.ok(productList.stream().map(Product::toString).toString());
+        return ResponseEntity.ok(productList.toString());
     }
 
     @PostMapping("/purchase/{productId}")
