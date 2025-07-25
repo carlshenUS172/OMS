@@ -11,7 +11,9 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 
 @Component
+// 缓存预热
 public class ProductStockInitializer implements ApplicationRunner {
+    // 让数据库中product的quantity作为初始库存放入缓存。为的是不让在业务中发现缓存未命中而写，容易发生脏读
 
     @Autowired
     private ProductMapper productMapper;

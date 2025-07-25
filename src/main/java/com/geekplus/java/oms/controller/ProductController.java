@@ -27,13 +27,15 @@ public class ProductController {
     private RedisTemplate redisTemplate;
 
     @GetMapping("/list")
-    public ResponseEntity<String> getProducts() {  // /oms/product/list
+    // url: /oms/product/list
+    public ResponseEntity<String> getProducts() {
         List<Product> productList = productService.getProductList();
         return ResponseEntity.ok(productList.toString());
     }
 
     @PostMapping("/purchase/{productId}")
-    public ResponseEntity<String> purchaseProduct(HttpSession session, @PathVariable("productId") String productId) {  // /oms/product/purchase/{productId}
+    // url: /oms/product/purchase/{productId}
+    public ResponseEntity<String> purchaseProduct(HttpSession session, @PathVariable("productId") String productId) {
         Object userInfo = session.getAttribute("userId");
         if (userInfo == null) {
             return ResponseEntity.badRequest().body("not logged in!");

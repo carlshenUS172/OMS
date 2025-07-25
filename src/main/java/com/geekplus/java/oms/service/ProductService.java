@@ -42,8 +42,11 @@ public class ProductService {
         //  双重检查锁
         String productKey = REDIS_KEY_PREFIX + productId;
 
+        // 确保库存有值
         Object value = operations.opsForValue().get(productKey);
         int stock = value == null ? 0 : Integer.parseInt((String) value);
+
+        // 没库存直接退，不拿锁，提升性能
         if (stock < quantityToDeduct) {
             return false;
         }
@@ -58,8 +61,8 @@ public class ProductService {
             }
 
             // 执行业务操作
-//            if (productMapper.deductQuantity(productId, quantityToDeduct) == 0) return false;
             Long remain = operations.opsForValue().decrement(productKey, quantityToDeduct);
+            // 发现库存是负数了，发生超卖
             if (remain == null || remain < 0) {
                 operations.opsForValue().increment(productKey, quantityToDeduct);  // 回滚补偿
                 return false;
@@ -67,6 +70,7 @@ public class ProductService {
 
             // 插入订单
             int res = orderService.addOrder(userId, productId);
+            // 插入失败
             if (res != 1) {
                 operations.opsForValue().increment(productKey, quantityToDeduct);  // 回滚补偿
                 return false;
@@ -79,6 +83,7 @@ public class ProductService {
     }
 
     @Transactional
+    // 事务传播为REQUIRED，合并事务
     public boolean purchase(String userId, String productId) {
         return purchase(userId, productId, 1);
     }
